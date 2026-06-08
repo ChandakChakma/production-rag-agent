@@ -1,0 +1,65 @@
+# Production ML Systems Design
+
+## Two-Stage Retrieval Architecture
+
+Production RAG systems commonly use a two-stage retrieval pipeline for optimal precision-latency tradeoff:
+
+**Stage 1: Candidate Generation (top-50)**
+Fast approximate retrieval identifies a large candidate set. This stage prioritizes recall—it's acceptable to include some irrelevant documents as long as the correct ones are present. Techniques used include dense ANN search and sparse BM25 keyword matching.
+
+**Stage 2: Reranking (top-5)**
+A computationally expensive but more accurate cross-encoder model scores each (query, candidate) pair and returns the top-K most relevant results. Cross-encoders achieve higher MRR@10 scores (0.85 vs 0.72) but are too slow for full-corpus scoring.
+
+## Hybrid Search with BM25 and Dense Vectors
+
+BM25 (Best Match 25) is a probabilistic relevance model that scores documents based on term frequency and inverse document frequency. It excels at exact keyword matching—critical for queries containing proper nouns, codes, and technical terms.
+
+Dense vector search captures semantic similarity. It handles paraphrases and conceptual queries that BM25 misses.
+
+Reciprocal Rank Fusion (RRF) combines rankings from multiple retrieval systems. The RRF formula is:
+  score(d) = Σ_r 1 / (k + rank_r(d))
+
+where k=60 is a smoothing constant. RRF is rank-based (not score-based), making it robust to score distribution differences between BM25 and cosine similarity.
+
+## ReAct Agent Architecture
+
+ReAct (Reasoning + Acting) is an agent framework where a language model interleaves reasoning traces with tool calls. The loop is:
+1. THINK: The LLM reasons about the current state and decides what to do next
+2. ACT: Execute a tool (retrieve, calculate, search)
+3. OBSERVE: Feed the tool result back to the LLM
+4. REPEAT until the LLM produces a final answer
+
+ReAct agents outperform pure chain-of-thought on knowledge-intensive tasks because they can dynamically retrieve relevant information.
+
+## RAGAS Evaluation Framework
+
+RAGAS (Retrieval Augmented Generation Assessment) provides four core metrics for evaluating RAG pipelines:
+
+- **Faithfulness**: What fraction of claims in the answer are supported by the retrieved context?
+- **Answer Relevancy**: How relevant is the answer to the question asked?
+- **Context Precision**: Of the retrieved chunks, what fraction are actually relevant?
+- **Context Recall**: What fraction of the ground-truth information is covered by retrieved context?
+
+Additionally, LLM-as-judge approaches use GPT-4 to score correctness, groundedness, and hallucination rates.
+
+## Production Observability for ML Systems
+
+Production ML systems require three pillars of observability:
+
+**Logging**: Structured JSON logs with trace correlation IDs, model inputs/outputs, latency, and token usage. structlog is the recommended Python library for production logging.
+
+**Metrics**: Prometheus counters and histograms track request rates, latency percentiles (p50/p95/p99), cache hit rates, error rates, and LLM cost per query.
+
+**Tracing**: OpenTelemetry distributed traces link together all components of a request—API handler, retrieval stages, LLM calls—enabling end-to-end latency analysis in tools like Jaeger.
+
+## Embedding Drift Detection
+
+As data distributions shift over time, embedding spaces can drift. A corpus ingested six months ago may have a different mean embedding vector than new documents. Drift detection compares the cosine similarity between the current corpus mean and new batch means. If drift exceeds a threshold (e.g., 1 - cosine_sim > 0.15), the system should alert operators to consider re-embedding older content or retraining the embedding model.
+
+## Cost Optimization Strategies
+
+Production RAG costs can be reduced by:
+1. **Embedding cache**: Cache embeddings on disk keyed by (model, text_hash). Saves 60-70% of embedding API calls on warm workloads.
+2. **Semantic cache**: Cache full query-answer pairs when a new query is semantically near a cached query (cosine_sim >= 0.95). Saves 20-30% of LLM calls in FAQ workloads.
+3. **Model cascading**: Use a cheap model (GPT-4o-mini) for straightforward queries, escalate to GPT-4o only when confidence is low.
+4. **Batch embedding**: Group documents into batches of 2048 to maximize OpenAI API throughput.

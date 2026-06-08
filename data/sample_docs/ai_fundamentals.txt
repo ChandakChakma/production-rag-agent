@@ -1,0 +1,40 @@
+# AI Fundamentals and Large Language Models
+
+## What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation (RAG) is a technique that combines information retrieval with language model generation. Instead of relying solely on knowledge baked into model weights during training, RAG systems retrieve relevant documents from an external knowledge base at query time and condition the language model's response on those retrieved documents.
+
+The core benefit of RAG is that it grounds language model outputs in retrieved facts, significantly reducing hallucination. It also allows knowledge to be updated without expensive model retraining—you simply update the document corpus.
+
+## Large Language Models (LLMs)
+
+Large Language Models are neural networks trained on massive text corpora using transformer architectures. They learn statistical patterns across billions of parameters to predict and generate coherent text. Modern LLMs like GPT-4, Claude, and Gemini demonstrate emergent capabilities including reasoning, code generation, and instruction following.
+
+Key properties of LLMs:
+- In-context learning: ability to adapt to new tasks from examples in the prompt
+- Chain-of-thought reasoning: step-by-step problem solving when prompted
+- Tool use: calling external APIs and functions via structured output
+
+## Embeddings and Vector Search
+
+Text embeddings are dense numerical representations of text in high-dimensional space. Semantically similar texts have embeddings that are close together (high cosine similarity). Models like OpenAI's text-embedding-3-small produce embeddings that capture deep semantic meaning.
+
+Approximate Nearest Neighbor (ANN) search algorithms like HNSW (Hierarchical Navigable Small World graphs) enable fast similarity search over millions of vectors. ChromaDB, Pinecone, and Weaviate are popular vector databases implementing these algorithms.
+
+## Transformer Architecture
+
+The transformer architecture, introduced in "Attention Is All You Need" (Vaswani et al., 2017), relies on self-attention mechanisms to model relationships between all tokens in a sequence simultaneously. Key components include:
+
+- Multi-head self-attention: attends to different parts of the input in parallel
+- Feed-forward networks: applies non-linear transformations at each position
+- Positional encodings: injects sequence order information
+- Layer normalization: stabilizes training
+
+## Prompt Engineering
+
+Effective prompt engineering is critical to extracting maximum performance from LLMs. Techniques include:
+- Zero-shot prompting: direct task specification without examples
+- Few-shot prompting: providing input-output examples in the prompt
+- Chain-of-thought (CoT): asking the model to reason step-by-step
+- System prompts: setting model persona and behavior constraints
+- Structured output: requesting JSON or XML formatted responses
