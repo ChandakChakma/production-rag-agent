@@ -1,6 +1,6 @@
 # RAG.Agent — Production RAG + Agent System
 
-> A MAANG-level AI engineering project demonstrating production-grade Retrieval-Augmented Generation, ReAct Agents, multi-dimensional evaluation pipelines, and a full observability stack — all behind a polished streaming UI.
+> AI engineering project demonstrating production-grade Retrieval-Augmented Generation, ReAct Agents, multi-dimensional evaluation pipelines, and a full observability stack — all behind a polished streaming UI.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg)](https://fastapi.tiangolo.com)
