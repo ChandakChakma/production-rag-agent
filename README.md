@@ -16,13 +16,13 @@
 │                        CLIENT / API GATEWAY                          │
 └────────────────────────────────┬────────────────────────────────────┘
                                  │  FastAPI + Middleware
-                    ┌────────────▼────────────┐
-                    │     REQUEST PIPELINE     │
+                    ┌────────────▼────────────--┐
+                    │     REQUEST PIPELINE      │
                     │  Auth | RateLimit | Trace │
-                    └────────────┬────────────┘
+                    └────────────┬────────────--┘
                                  │
           ┌──────────────────────▼─────────────────────┐
-          │              RAG AGENT (ReAct)              │
+          │              RAG AGENT (ReAct)             │
           │   ┌─────────────┐    ┌──────────────────┐  │
           │   │   Reasoner  │◄──►│   Tool Executor  │  │
           │   │  (LLM + CoT)│    │ RAG|Calc|Search  │  │
@@ -30,41 +30,41 @@
           │   ┌─────────────┐    ┌──────────────────┐  │
           │   │  Convo Mem  │    │  History Window  │  │
           │   │ (compressed)│    │   (windowed)     │  │
-          └───┴─────┬───────┴────┴──────────────────┘  │
+          └───┴─────┬───────┴────┴──────────────────┘--│
                     │
           ┌─────────▼───────────────────────────────────┐
-          │           TWO-STAGE RETRIEVAL                │
-          │                                              │
-          │  Stage 1: Hybrid Retrieval (Top-K = 50)      │
+          │           TWO-STAGE RETRIEVAL               │
+          │                                             │
+          │  Stage 1: Hybrid Retrieval (Top-K = 50)     │
           │  ┌──────────────┐   ┌──────────────────┐    │
           │  │  Dense (ANN) │   │  Sparse (BM25)   │    │
           │  │  ChromaDB /  │   │  rank-bm25 +     │    │
           │  │  Pinecone    │   │  TF-IDF weights  │    │
           │  └──────┬───────┘   └────────┬─────────┘    │
           │         └──────────┬─────────┘              │
-          │               RRF Fusion (k=60)              │
-          │                                              │
+          │               RRF Fusion (k=60)             │
+          │                                             │
           │  Stage 2: Cross-Encoder Reranking (Top-K=5) │
           │  ┌────────────────────────────────────────┐ │
-          │  │  ms-marco-MiniLM-L-6-v2               │ │
+          │  │  ms-marco-MiniLM-L-6-v2                │ │
           │  └────────────────────────────────────────┘ │
           └─────────────────────────────────────────────┘
                     │
           ┌─────────▼───────────────────────────────────┐
-          │              EVALUATION PIPELINE             │
+          │              EVALUATION PIPELINE            │
           │  ┌──────────────┐   ┌─────────────────────┐ │
-          │  │  RAGAS Suite │   │   LLM-as-Judge       │ │
-          │  │  Faithfulness│   │   Correctness        │ │
-          │  │  Relevancy   │   │   Groundedness       │ │
-          │  │  Ctx Recall  │   │   Hallucination Rate │ │
+          │  │  RAGAS Suite │   │   LLM-as-Judge      │ │
+          │  │  Faithfulness│   │   Correctness       │ │
+          │  │  Relevancy   │   │   Groundedness      │ │
+          │  │  Ctx Recall  │   │   Hallucination Rate│ │
           │  └──────────────┘   └─────────────────────┘ │
           └─────────────────────────────────────────────┘
                     │
           ┌─────────▼───────────────────────────────────┐
-          │              OBSERVABILITY STACK             │
-          │  OpenTelemetry Traces │ Prometheus Metrics   │
-          │  Structured Logs      │ Cost Tracker         │
-          │  Latency P50/P95/P99  │ Token Counter        │
+          │              OBSERVABILITY STACK            │
+          │  OpenTelemetry Traces │ Prometheus Metrics  │
+          │  Structured Logs      │ Cost Tracker        │
+          │  Latency P50/P95/P99  │ Token Counter       │
           └─────────────────────────────────────────────┘
 ```
 
@@ -135,7 +135,7 @@
 ### 1. Clone & install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/production-rag-agent-system.git
+git clone https://github.com/ChandakChakma/production-rag-agent-system.git
 cd production-rag-agent-system
 
 python -m venv venv
