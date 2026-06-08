@@ -382,8 +382,3 @@ mypy src/
 pytest tests/ -v
 ```
 
----
-
-## License
-
-MIT — see `LICENSE`.
